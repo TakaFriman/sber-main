@@ -103,8 +103,9 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           BottomNavigationBarItem(
             icon: Container(
-              margin: const EdgeInsets.only(top: 3),
-              padding: const EdgeInsets.all(1),
+              width: 23,
+              height: 18,
+              margin: const EdgeInsets.only(bottom: 2),
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(2)),
                 color: selectedIndex == 1
@@ -117,7 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 padding: EdgeInsets.symmetric(horizontal: 3.0),
                 child: Icon(
                   Icons.signal_cellular_alt,
-                  color: Color(0xFF1c1c1c), size: 18, // Цвет стрелки
+                  color: Color(0xFF1c1c1c), size: 16, // Цвет стрелки
                 ),
               ),
             ),
@@ -132,8 +133,9 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           BottomNavigationBarItem(
             icon: Container(
-              margin: const EdgeInsets.only(top: 3),
-              padding: const EdgeInsets.all(1),
+              width: 23, // Ширина фона
+              height: 18, // Высота фона
+              margin: const EdgeInsets.only(bottom: 2, top: 2),
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(5)),
                 color: selectedIndex == 3
@@ -146,7 +148,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 padding: EdgeInsets.symmetric(horizontal: 3.0),
                 child: Icon(
                   Icons.arrow_forward,
-                  color: Color(0xFF1c1c1c), size: 18, // Цвет стрелки
+                  color: Color(0xFF1c1c1c), size: 16, // Цвет стрелки
                 ),
               ),
             ),

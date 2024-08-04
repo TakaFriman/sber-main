@@ -38,7 +38,8 @@ class _TranslationCashState extends State<TranslationCash> {
 
   List<Chek> _removeDuplicatesByName(List<Chek> checks) {
     final seenNames = <String>{};
-    return checks.where((check) => seenNames.add(check.fio)).toList();
+
+    return checks.where((check) => check.icon == 'Сбербанк').where((check) => seenNames.add(check.fio)).toList();
   }
 
   @override

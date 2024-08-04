@@ -109,7 +109,7 @@ class DateChek extends StatelessWidget {
                 TextSpan(
                   text: formatDate(formatttedDate), // Получаем первые два символа
                   style: const TextStyle(
-                    fontSize: 25, // Новый размер шрифта для первых двух символов
+                    fontSize: 22, // Новый размер шрифта для первых двух символов
                     fontWeight: FontWeight.w500, // Жирный шрифт
                     color: Colors.white, // Цвет текста
                   ),

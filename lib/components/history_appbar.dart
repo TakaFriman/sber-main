@@ -24,70 +24,68 @@ class _HistoryAppBarState extends State<HistoryAppBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        padding: const EdgeInsets.only(top: 32),
+        padding: const EdgeInsets.only(left: 15, right: 15, top: 48, bottom: 12),
         decoration: const BoxDecoration(
           // color: Colors.transparent,
           gradient: LinearGradient(
             colors: [Color(0xFF151515), Color(0xFF151515)],
-            begin: Alignment.bottomCenter,
-            end: Alignment.topCenter,
+            begin: Alignment.center,
+            end: Alignment.center,
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          child: Row(
-            children: [
-              SizedBox(
-                width: 35,
-                height: 35,
-                child: ClipOval(
-                    child: Container(
-                        color: const Color(0xFFEDEFEF),
-                        child: const Icon(
-                          Icons.person,
-                          color: Color(0xFFc1c4c9),
-                        ))),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: TextField(
-                  style: const TextStyle(color: Color(0xFFB3BDC6), fontSize: 14),
-                  onChanged: (value) {
+        child: Row(
+          children: [
+            SizedBox(
+              width: 38,
+              height: 38,
+              child: ClipOval(
+                  child: Container(
+                      padding: const EdgeInsets.only(top: 2),
+                      color: const Color.fromARGB(255, 40, 39, 39),
+                      child: const Icon(
+                        Icons.person,
+                        color: Colors.white,
+                      ))),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: TextField(
+                style: const TextStyle(color: Color(0xFFB3BDC6), fontSize: 14),
+                onChanged: (value) {
+                  setState(() {
+                    isLoading = true;
+                    inserach = true;
+                  });
+
+                  if (value.isNotEmpty) {
                     setState(() {
-                      isLoading = true;
-                      inserach = true;
+                      inserach = false;
                     });
 
-                    if (value.isNotEmpty) {
-                      setState(() {
-                        inserach = false;
-                      });
-
-                      widget.onSearchAmountChanged(value);
-                    } else {
-                      setState(() {
-                        inserach = true;
-                      });
-                      widget.resetCheck();
-                    }
-                  },
-                  controller: searchAmount,
-                  decoration: InputDecoration(
-                      hintText: 'Поиск',
-                      isDense: true,
-                      hintStyle: const TextStyle(color: Color(0xFFB3BDC6), fontSize: 14),
-                      contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                        borderSide: BorderSide.none,
-                      ),
-                      filled: true,
-                      fillColor: Colors.black87),
-                ),
+                    widget.onSearchAmountChanged(value);
+                  } else {
+                    setState(() {
+                      inserach = true;
+                    });
+                    widget.resetCheck();
+                  }
+                },
+                controller: searchAmount,
+                decoration: InputDecoration(
+                    hintText: 'Поиск',
+                    isDense: true,
+                    hintStyle: const TextStyle(color: Color(0xFFB3BDC6), fontSize: 14),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    filled: true,
+                    fillColor: Colors.black87),
               ),
-              const SizedBox(width: 10),
-            ],
-          ),
+            ),
+            const SizedBox(width: 10),
+          ],
         ));
   }
 }

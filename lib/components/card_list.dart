@@ -84,6 +84,7 @@ class _CardsListState extends State<CardsList> {
             children: [
               CardIconWidget(
                 svg: 'assets/Component.svg',
+                
               ),
               SizedBox(height: 8),
               CardIconWidget(

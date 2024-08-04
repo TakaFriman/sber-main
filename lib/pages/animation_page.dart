@@ -94,7 +94,7 @@ class _NextScreenState extends State<NextScreen> with SingleTickerProviderStateM
                             ),
                           ),
                           Text(
-                            snapshot.data?.name != null ? '${snapshot.data?.name}!' : 'Новый пользователь!',
+                            snapshot.data?.name != null ? '${snapshot.data?.name}' : 'Новый пользователь',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 30,

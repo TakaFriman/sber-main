@@ -14,7 +14,7 @@ class CardIconWidget extends StatelessWidget {
       child: AspectRatio(
         aspectRatio: 10 / 11,
         child: Container(
-          padding: const EdgeInsets.all(15),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
               gradient: const LinearGradient(
@@ -28,7 +28,10 @@ class CardIconWidget extends StatelessWidget {
                   Color.fromRGBO(58, 61, 70, 1),
                 ],
               )),
-          child: SvgPicture.asset(svg),
+          child: SvgPicture.asset(
+            svg,
+            width: 20,
+          ),
         ),
       ),
     );

@@ -11,7 +11,7 @@ class CustomAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 15, right: 15, top: 32, bottom: 12),
+      padding: const EdgeInsets.only(left: 15, right: 15, top: 48, bottom: 12),
       child: Row(
         children: [
           InkWell(
@@ -46,18 +46,19 @@ class CustomAppBar extends StatelessWidget {
               );
             },
             child: SizedBox(
-              width: 35,
-              height: 35,
+              width: 38,
+              height: 38,
               child: ClipOval(
                   child: Container(
-                      color: const Color(0xFFEDEFEF),
+                      padding: const EdgeInsets.only(top: 2),
+                      color: const Color.fromARGB(255, 40, 39, 39),
                       child: const Icon(
                         Icons.person,
-                        color: Color(0xFFc1c4c9),
+                        color: Colors.white,
                       ))),
             ),
           ),
-          const SizedBox(width: 20),
+          const SizedBox(width: 10),
           Expanded(
             child: TextField(
               decoration: InputDecoration(

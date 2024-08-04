@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:sber/components/date_and_history_chek.dart';
 import 'package:sber/components/history_appbar.dart';
@@ -10,6 +11,7 @@ import 'package:sber/models/profile.dart';
 import 'package:sber/pages/chek_about.dart';
 import 'package:sber/pages/home_page.dart';
 import 'package:sber/pages/incoming_page.dart';
+import 'package:sber/theme/colors.dart';
 
 import '../components/select_bar.dart';
 
@@ -27,12 +29,9 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
-  // final bool _isFirstLoad = true;
-
   String calculateTotalCashForStatus(String status) {
     double totalCash = 0;
 
-    // Проходим по всем чекам
     for (var check in _checks) {
       final currentMonth = DateFormat('MMMM', 'ru').format(DateTime.now());
       final month = DateFormat('MMMM', 'ru').format(DateTime.tryParse(check.date) ?? DateTime.timestamp());
@@ -42,9 +41,10 @@ class _HistoryPageState extends State<HistoryPage> {
       }
     }
 
-    // Возвращаем строковое представление общей суммы
     return '$totalCash';
   }
+
+  bool noResults = false;
 
   List<Chek> _checks = [];
   List<Chek> _newChecks = [];
@@ -52,8 +52,7 @@ class _HistoryPageState extends State<HistoryPage> {
     setState(() {
       enabled1 = true;
     });
-    //final random = Random();
-    //final delaySeconds = random.nextInt(2);
+
     await Future.delayed(const Duration(seconds: 1));
 
     setState(() {
@@ -66,29 +65,20 @@ class _HistoryPageState extends State<HistoryPage> {
   @override
   void initState() {
     super.initState();
-    // Вызов функции, которая изменяет состояние isLoading после случайного времени
     _simulateLoading();
     _loadChecks();
   }
 
-  // Метод для загрузки чеков из локального хранилища
   void _loadChecks() async {
     try {
       List<Chek> loadedChecks = await CheckRepository.loadChecks();
-      // _checks = sortChecksByDate(loadedChecks);
       setState(() {
         _checks = loadedChecks;
+        _newChecks = loadedChecks;
       });
       incoming = calculateTotalCashForStatus('Входящий перевод');
       outgoing = calculateTotalCashForStatus('Исходящий перевод');
-      // print('Загруженные чеки:');
-      // print(_checks.length);
-      // for (var check in _checks) {
-      //   print('Дата: ${check.date}, ФИО: ${check.fio}, Сумма: ${check.cash}');
-      // }
     } catch (e) {
-      // Обработка ошибок, если загрузка не удалась
-      // ignore: avoid_print
       print('Ошибка при загрузке чеков: $e');
     }
   }
@@ -96,47 +86,35 @@ class _HistoryPageState extends State<HistoryPage> {
   String calculateTotalCashForDate(String currentDate) {
     double totalCash = 0;
 
-    // Проходим по всем чекам
     for (var check in _checks) {
-      // Если дата чека совпадает с текущей датой, добавляем его сумму к общей сумме
       if (check.date == currentDate) {
         totalCash += check.cash;
       }
     }
 
-    // Возвращаем строковое представление общей суммы
     return '$totalCash';
   }
 
-  // void filterChecksByAmount(double amount) {
-  //   setState(() {
-  //     // Фильтруем чеки на основе введенной суммы
-  //     _newChecks = _checks
-  //         .where((check) => (check.cash - amount).abs() < 0.0001)
-  //         .toList();
-  //     _checks = _newChecks;
-  //   });
-  // }
   void filterChecks(String searchText) {
     setState(() {
-      // Фильтруем чеки на основе введенного текста
-      _newChecks = _checks.where((check) {
-        // Получаем строковое представление суммы чека и имени
-        String cashString = check.cash.toString().toLowerCase();
-        String name = check.fio.toLowerCase();
+      if (searchText.isEmpty) {
+        _newChecks = _checks;
+        noResults = false;
+      } else {
+        _newChecks = _checks.where((check) {
+          String cashString = check.cash.toString().toLowerCase();
+          String name = check.fio.toLowerCase();
+          bool isNumericSearch = isNumeric(searchText[0]);
 
-        // Проверяем, начинается ли строка с цифры или буквы
-        bool isNumericSearch = isNumeric(searchText[0]);
+          if (isNumericSearch) {
+            return cashString.startsWith(searchText.toLowerCase());
+          } else {
+            return name.startsWith(searchText.toLowerCase());
+          }
+        }).toList();
 
-        if (isNumericSearch) {
-          // Поиск по сумме чека (cash)
-          return cashString.startsWith(searchText.toLowerCase());
-        } else {
-          // Поиск по имени (fio)
-          return name.startsWith(searchText.toLowerCase());
-        }
-      }).toList();
-      _checks = _newChecks;
+        noResults = _newChecks.isEmpty;
+      }
     });
   }
 
@@ -147,40 +125,31 @@ class _HistoryPageState extends State<HistoryPage> {
   String outCalculateTotalCashForDate(String currentDate, String status) {
     double totalCash = 0;
 
-    // Проходим по всем чекам
     for (var check in _checks) {
-      // Если дата чека совпадает с текущей датой и статус чека равен указанному статусу,
-      // добавляем его сумму к общей сумме
       if (check.date == currentDate && check.status == status) {
         totalCash += check.cash;
       }
     }
 
-    // Возвращаем строковое представление общей суммы
     return '$totalCash';
   }
 
   void resetChecks() {
     setState(() {
-      // Сбрасываем фильтр и показываем все чеки
-      _loadChecks();
+      _newChecks = _checks;
+      noResults = false;
     });
   }
 
-  // Функция, которая имитирует загрузку данных
   Future<void> _simulateLoading() async {
-    // Генерация случайного времени от 1 до 2 секунд
-
     final random = Random();
     final delaySeconds = random.nextInt(2) + 1;
 
     setState(() {
       enabled1 = true;
     });
-    // Задержка на случайное время
-    await Future.delayed(Duration(seconds: delaySeconds));
 
-    // После задержки обновляем состояние, чтобы скрыть индикатор загрузки
+    await Future.delayed(Duration(seconds: delaySeconds));
 
     setState(() {
       isLoading = false;
@@ -188,17 +157,6 @@ class _HistoryPageState extends State<HistoryPage> {
     });
   }
 
-  // static int extractFirstNumberFromString(String input) {
-  //   RegExp regex = RegExp(r'\d+');
-  //   Match? match = regex.firstMatch(input);
-  //   if (match != null) {
-  //     return int.parse(match.group(0)!);
-  //   } else {
-  //     return 0; // Возвращаем 0, если не найдено ни одного числа
-  //   }
-  // }
-
-  // Метод для сортировки списка экземпляров класса Chek по дате
   static List<Chek> sortChecksByDate(List<Chek> checks) {
     checks.sort((a, b) => a.date.compareTo(b.date));
     return checks;
@@ -206,13 +164,10 @@ class _HistoryPageState extends State<HistoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Сортируем список чеков по дате
     _checks = sortChecksByDate(_checks);
-
-    // Создаем список уникальных дат
-    List<String> uniqueDates = _checks.map((check) => check.date).toSet().toList();
-    // uniqueDates.sort((a, b) => b.compareTo(a));
+    List<String> uniqueDates = _newChecks.map((check) => check.date).toSet().toList();
     uniqueDates = uniqueDates.reversed.toList();
+
     return Stack(
       children: [
         RefreshIndicator(
@@ -221,132 +176,191 @@ class _HistoryPageState extends State<HistoryPage> {
           onRefresh: _refresh,
           displacement: 40,
           edgeOffset: 300.0,
-          child: ListView.builder(
-            itemCount: uniqueDates.length,
-            itemBuilder: (context, index) {
-              // Получаем текущую дату
-              String currentDate = uniqueDates[index];
-              var outSum = outCalculateTotalCashForDate(currentDate, 'Исходящий перевод');
-              // Создаем виджет DateChek для текущей даты
-              Widget dateChek = DateChek(
-                date: currentDate,
-                cash: calculateTotalCashForDate(currentDate),
-                totalCash: outSum,
-              );
-
-              // Фильтруем чеки по текущей дате
-              List<Chek> filteredChecks = _checks.where((check) => check.date == currentDate).toList();
-              if (searchAmount != null) {
-                filteredChecks = filteredChecks
-                    // ignore: unrelated_type_equality_checks
-                    .where((check) => check.cash == searchAmount)
-                    .toList();
-              }
-              // Создаем виджеты ChekHistory для отфильтрованных чеков
-              List<Widget> chekHistoryWidgets = filteredChecks
-                  .map((check) => InkWell(
-                        onTap: () {
-                          check.status == "Исходящий перевод"
-                              ?
-                              // При нажатии на чек открываем экран с подробной информацией о чеке
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => CheckDetailsScreen(
-                                      check: check,
-                                      myCreditCart: widget.myCreditCard,
-                                    ),
-                                  ),
-                                )
-                              : // При нажатии на чек открываем экран с подробной информацией о чеке
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => IncomingPage(
-                                      chek: check,
-                                      myCreditCard: widget.myCreditCard,
-                                    ),
-                                  ),
-                                );
-                        },
-                        splashColor: Colors.grey, // Цвет всплеска при нажатии
-                        highlightColor: Colors.transparent,
-                        child: ChekHistory(
-                          fio: check.fio,
-                          type: check.status,
-                          cash: check.cash,
-                          icon: check.icon,
+          child: noResults
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                  ).copyWith(top: 148),
+                  child: Column(
+                    children: [
+                      const Text(
+                        'Ничего не нашлось',
+                        style: TextStyle(color: Colors.white, fontSize: 18),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        'Проверьте, что в запросе нет опечаток',
+                        style: TextStyle(color: Colors.grey, fontSize: 14),
+                      ),
+                      const SizedBox(height: 30),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: BODY_DARK_GRAY,
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                      ))
-                  .toList()
-                  .reversed
-                  .toList();
-
-              // Возвращаем виджеты в списке
-              return Column(
-                children: [
-                  if (index == 0 && !inserach)
-                    const SizedBox(
-                      height: 70,
-                    ),
-                  if (index == 0 && (inserach))
-                    Container(
-                      decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(23),
-                          bottomRight: Radius.circular(23),
-                        ),
-                        gradient: LinearGradient(
-                          colors: [
-                            Color(0xFF0e0e0e),
-                            Color(0xFF0f0f0f),
-                            Color(0xFF111110),
-                            Color(0xFF131312),
-                            Color(0xFF151514),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ListTile(
+                              titleAlignment: ListTileTitleAlignment.titleHeight,
+                              leading: SvgPicture.asset(
+                                'assets/Виджет.svg',
+                                width: 30,
+                              ),
+                              title: const Text('Все сервисы', style: TextStyle(color: Colors.white)),
+                              subtitle: const Text('Продукты экосистемы Сбера и партнёров',
+                                  style: TextStyle(color: Colors.grey)),
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.only(left: 62, right: 15),
+                              child: Divider(
+                                height: 10,
+                                color: Color.fromARGB(255, 74, 74, 74),
+                              ),
+                            ),
+                            ListTile(
+                              titleAlignment: ListTileTitleAlignment.titleHeight,
+                              leading: SvgPicture.asset(
+                                'assets/Виджет.svg',
+                                width: 30,
+                              ),
+                              title: const Text('Подсказки и обучение', style: TextStyle(color: Colors.white)),
+                              subtitle: const Text('Всё о сервисах банка и возможностях приложения',
+                                  style: TextStyle(color: Colors.grey)),
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.only(left: 62, right: 15),
+                              child: Divider(
+                                height: 10,
+                                color: Color.fromARGB(255, 74, 74, 74),
+                              ),
+                            ),
+                            ListTile(
+                              titleAlignment: ListTileTitleAlignment.titleHeight,
+                              leading: SvgPicture.asset(
+                                'assets/Виджет.svg',
+                                width: 30,
+                              ),
+                              title: const Text('Оплата по реквизитам', style: TextStyle(color: Colors.white)),
+                              subtitle: const Text('Компаниям за услуги', style: TextStyle(color: Colors.grey)),
+                            ),
                           ],
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
                         ),
                       ),
-                      child: Column(
-                        children: [
-                          // Показываем HistoryAppBar только если не идет поиск
-                          TitleHistory(
-                            incoming: incoming!,
-                            outgoing: outgoing!,
-                          ),
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  itemCount: uniqueDates.length,
+                  itemBuilder: (context, index) {
+                    String currentDate = uniqueDates[index];
+                    var outSum = outCalculateTotalCashForDate(currentDate, 'Исходящий перевод');
+                    Widget dateChek = DateChek(
+                      date: currentDate,
+                      cash: calculateTotalCashForDate(currentDate),
+                      totalCash: outSum,
+                    );
 
-                          const SelectBarList(),
+                    List<Chek> filteredChecks = _newChecks.where((check) => check.date == currentDate).toList();
+                    if (searchAmount != null) {
+                      filteredChecks = filteredChecks.where((check) => check.cash == searchAmount).toList();
+                    }
+                    List<Widget> chekHistoryWidgets = filteredChecks
+                        .map((check) => InkWell(
+                              onTap: () {
+                                check.status == "Исходящий перевод"
+                                    ? Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => CheckDetailsScreen(
+                                            check: check,
+                                            myCreditCart: widget.myCreditCard,
+                                          ),
+                                        ),
+                                      )
+                                    : Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => IncomingPage(
+                                            chek: check,
+                                            myCreditCard: widget.myCreditCard,
+                                          ),
+                                        ),
+                                      );
+                              },
+                              splashColor: Colors.grey,
+                              highlightColor: Colors.transparent,
+                              child: ChekHistory(
+                                fio: check.fio,
+                                type: check.status,
+                                cash: check.cash,
+                                icon: check.icon,
+                              ),
+                            ))
+                        .toList()
+                        .reversed
+                        .toList();
+
+                    return Column(
+                      children: [
+                        if (index == 0 && !inserach)
                           const SizedBox(
-                            height: 10,
+                            height: 70,
                           ),
-                        ],
-                      ),
-                    ),
-                  Center(
-                      child: isLoading
-                          ? Center(
-                              child: (index == 0)
-                                  ? const Padding(
-                                      padding: EdgeInsets.only(top: 68.0),
-                                      child: CircularProgressIndicator(
-                                        color: Color(0xFF08A652),
-                                      ),
-                                    )
-                                  : const Text(''))
-                          : Column(
+                        if (index == 0 && (inserach))
+                          Container(
+                            decoration: const BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(23),
+                                bottomRight: Radius.circular(23),
+                              ),
+                              gradient: LinearGradient(
+                                colors: [
+                                  Color(0xFF0e0e0e),
+                                  Color(0xFF0f0f0f),
+                                  Color(0xFF111110),
+                                  Color(0xFF131312),
+                                  Color(0xFF151514),
+                                ],
+                                begin: Alignment.center,
+                                end: Alignment.center,
+                              ),
+                            ),
+                            child: Column(
                               children: [
-                                dateChek,
-                                ...chekHistoryWidgets,
+                                TitleHistory(
+                                  incoming: incoming!,
+                                  outgoing: outgoing!,
+                                ),
+                                const SelectBarList(),
+                                const SizedBox(
+                                  height: 10,
+                                ),
                               ],
-                            )),
-                ],
-              );
-            },
-          ),
+                            ),
+                          ),
+                        Center(
+                            child: isLoading
+                                ? Center(
+                                    child: (index == 0)
+                                        ? const Padding(
+                                            padding: EdgeInsets.only(top: 68.0),
+                                            child: CircularProgressIndicator(
+                                              color: Color(0xFF08A652),
+                                            ),
+                                          )
+                                        : const Text(''))
+                                : Column(
+                                    children: [
+                                      dateChek,
+                                      ...chekHistoryWidgets,
+                                    ],
+                                  )),
+                      ],
+                    );
+                  },
+                ),
         ),
-        // Показываем Container только при первой загрузке
-
         HistoryAppBar(
           onSearchAmountChanged: filterChecks,
           resetCheck: resetChecks,
@@ -380,7 +394,11 @@ class SelectBarList extends StatelessWidget {
                 SizedBox(
                   width: 10,
                 ),
-                SelectBar(text: 'Карты и счета')
+                SelectBar(text: 'Карта и счёт'),
+                SizedBox(
+                  width: 10,
+                ),
+                SelectBar(text: 'Сумма'),
               ],
             ),
           ],

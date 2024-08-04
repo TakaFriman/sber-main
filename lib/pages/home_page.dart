@@ -147,7 +147,7 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(left: 15, right: 15, top: 60),
+                        padding: const EdgeInsets.only(left: 15, right: 15, top: 70),
                         child: CardBalanceWidget(
                           myCreditCard: widget.myCreditCard ??
                               CreditCard(
