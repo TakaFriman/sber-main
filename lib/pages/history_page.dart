@@ -205,14 +205,14 @@ class _HistoryPageState extends State<HistoryPage> {
                               titleAlignment: ListTileTitleAlignment.titleHeight,
                               leading: SvgPicture.asset(
                                 'assets/Виджет.svg',
-                                width: 30,
+                                width: 35,
                               ),
                               title: const Text('Все сервисы', style: TextStyle(color: Colors.white)),
                               subtitle: const Text('Продукты экосистемы Сбера и партнёров',
                                   style: TextStyle(color: Colors.grey)),
                             ),
                             const Padding(
-                              padding: EdgeInsets.only(left: 62, right: 15),
+                              padding: EdgeInsets.only(left: 67, right: 15),
                               child: Divider(
                                 height: 10,
                                 color: Color.fromARGB(255, 74, 74, 74),
@@ -221,15 +221,16 @@ class _HistoryPageState extends State<HistoryPage> {
                             ListTile(
                               titleAlignment: ListTileTitleAlignment.titleHeight,
                               leading: SvgPicture.asset(
-                                'assets/Виджет.svg',
-                                width: 30,
+                                'assets/education.svg',
+                                width: 35,
+                                color: const Color(0xFF2d8246),
                               ),
                               title: const Text('Подсказки и обучение', style: TextStyle(color: Colors.white)),
                               subtitle: const Text('Всё о сервисах банка и возможностях приложения',
                                   style: TextStyle(color: Colors.grey)),
                             ),
                             const Padding(
-                              padding: EdgeInsets.only(left: 62, right: 15),
+                              padding: EdgeInsets.only(left: 67, right: 15),
                               child: Divider(
                                 height: 10,
                                 color: Color.fromARGB(255, 74, 74, 74),
@@ -238,8 +239,9 @@ class _HistoryPageState extends State<HistoryPage> {
                             ListTile(
                               titleAlignment: ListTileTitleAlignment.titleHeight,
                               leading: SvgPicture.asset(
-                                'assets/Виджет.svg',
-                                width: 30,
+                                'assets/sber.svg',
+                                width: 35,
+                                color: const Color(0xFF2d8246),
                               ),
                               title: const Text('Оплата по реквизитам', style: TextStyle(color: Colors.white)),
                               subtitle: const Text('Компаниям за услуги', style: TextStyle(color: Colors.grey)),

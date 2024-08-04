@@ -91,12 +91,15 @@ class _MyHomePageState extends State<MyHomePage> {
         unselectedItemColor: const Color(0xFF888888),
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              'assets/home.svg',
-              width: 20,
-              colorFilter: ColorFilter.mode(
-                selectedIndex == 0 ? const Color(0xFF2d8246) : const Color(0xFF888888),
-                BlendMode.srcIn,
+            icon: Container(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: SvgPicture.asset(
+                'assets/home.svg',
+                width: 20,
+                colorFilter: ColorFilter.mode(
+                  selectedIndex == 0 ? const Color(0xFF2d8246) : const Color(0xFF888888),
+                  BlendMode.srcIn,
+                ),
               ),
             ),
             label: 'Главный',
@@ -105,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: Container(
               width: 23,
               height: 18,
-              margin: const EdgeInsets.only(bottom: 2),
+              margin: const EdgeInsets.only(bottom: 6, top: 2),
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(2)),
                 color: selectedIndex == 1
@@ -135,7 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: Container(
               width: 23, // Ширина фона
               height: 18, // Высота фона
-              margin: const EdgeInsets.only(bottom: 2, top: 2),
+              margin: const EdgeInsets.only(bottom: 6, top: 2),
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(5)),
                 color: selectedIndex == 3
@@ -154,8 +157,14 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             label: 'Платежи',
           ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.watch_later),
+          BottomNavigationBarItem(
+            icon: Container(
+              padding: const EdgeInsets.only(bottom: 2),
+              child: const Icon(
+                Icons.watch_later,
+                size: 24,
+              ),
+            ),
             label: 'История',
           ),
         ],
