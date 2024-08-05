@@ -78,7 +78,7 @@ class _HistoryAppBarState extends State<HistoryAppBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(left: 15, right: 15, top: 48, bottom: 12),
+      padding: const EdgeInsets.only(left: 15, right: 15, top: 10, bottom: 0),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [Color(0xFF151515), Color(0xFF151515)],

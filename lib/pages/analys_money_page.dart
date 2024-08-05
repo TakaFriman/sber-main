@@ -470,6 +470,7 @@ class IncomesTab extends StatelessWidget {
               category: 'Добавить зачисление',
               transactions: 'Например, если вам дали наличные',
             ),
+            const SizedBox(height: 64),
           ],
         ),
       ),
@@ -507,6 +508,8 @@ class CategoryItem extends StatelessWidget {
           iconText, width: 40, color: color, //const Color.fromARGB(255, 12, 214, 73),
         ),
         title: Text(
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
           category,
           style: const TextStyle(
             color: Color(0xffeeeeee),

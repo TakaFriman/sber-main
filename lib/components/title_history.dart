@@ -50,12 +50,10 @@ class TitleHistory extends StatelessWidget {
         ),
       ),
       child: Column(children: [
-        const SizedBox(
-          height: 70,
-        ),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15.0),
-          child: Row(
+        Padding(
+          padding:
+              const EdgeInsets.symmetric(horizontal: 15.0).copyWith(top: MediaQuery.of(context).size.height * 0.095),
+          child: const Row(
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

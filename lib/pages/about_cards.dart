@@ -84,11 +84,11 @@ class _AboutCardsState extends State<AboutCards> with SingleTickerProviderStateM
       ),
       backgroundColor: const Color(0xFF121212),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
         child: Column(
           children: [
             SizedBox(
-              height: 220,
+              height: MediaQuery.of(context).size.height * 0.295,
               width: double.infinity,
               child: GestureDetector(
                   onTap: _flipCard,
@@ -178,7 +178,7 @@ class _AboutCardsState extends State<AboutCards> with SingleTickerProviderStateM
                                       ),
                                     ),
                                     Padding(
-                                      padding: const EdgeInsets.all(20.0),
+                                      padding: const EdgeInsets.all(15.0),
                                       child: Row(
                                         crossAxisAlignment: CrossAxisAlignment.center,
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -192,12 +192,12 @@ class _AboutCardsState extends State<AboutCards> with SingleTickerProviderStateM
                                                   style: const TextStyle(
                                                       color: Color(0xfff4f4f4),
                                                       fontSize: 14,
-                                                      fontWeight: FontWeight.w500)),
+                                                      fontWeight: FontWeight.w600)),
                                               const Text('Показать данные',
                                                   style: TextStyle(
                                                       color: Color(0xfff4f4f4),
                                                       fontSize: 14,
-                                                      fontWeight: FontWeight.w500))
+                                                      fontWeight: FontWeight.w600))
                                             ],
                                           ),
                                           ClipRRect(
@@ -402,7 +402,7 @@ class _AboutCardsDataState extends State<AboutCardsData> {
       child: LoadingOverlay(
         isLoading: isLoading,
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(15.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -467,7 +467,7 @@ class _AboutCardsDataState extends State<AboutCardsData> {
                             },
                           )
                         : Padding(
-                            padding: const EdgeInsets.all(6.0),
+                            padding: const EdgeInsets.all(5.0),
                             child: InkWell(
                               onTap: () {
                                 setState(() {
@@ -557,7 +557,7 @@ class _AboutCardsDataState extends State<AboutCardsData> {
                                 });
                               },
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(6.0),
                                 child: SvgPicture.asset(
                                   'assets/copy.svg',
                                   width: 20,
@@ -585,31 +585,34 @@ class _AboutCardsDataState extends State<AboutCardsData> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       // mainAxisSize: MainAxisSize.min,
                       children: [
-                        Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 2),
-                            child: isCardCvcHidden
-                                ? Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 2),
-                                    child: RichText(
-                                      text: const TextSpan(
-                                        children: [
-                                          TextSpan(
-                                            text: '\u2022\u2022\u2022',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w400,
-                                              fontSize: 14,
-                                              color: Color(0xfff4f4f4),
+                        Expanded(
+                          flex: 3,
+                          child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 2),
+                              child: isCardCvcHidden
+                                  ? Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 2),
+                                      child: RichText(
+                                        text: const TextSpan(
+                                          children: [
+                                            TextSpan(
+                                              text: '\u2022\u2022\u2022',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 14,
+                                                color: Color(0xfff4f4f4),
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  )
-                                : Text(
-                                    widget.cvc,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.w300, fontSize: 12, color: Color(0xfff4f4f4)),
-                                  )),
+                                    )
+                                  : Text(
+                                      widget.cvc,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w300, fontSize: 12, color: Color(0xfff4f4f4)),
+                                    )),
+                        ),
                         !isCardCvcHidden
                             ? IconButton(
                                 icon: const Icon(
@@ -692,24 +695,30 @@ class _AboutCardsDataState extends State<AboutCardsData> {
                       ],
                     ),
                   ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Это CVC2/CVV2-код.',
-                        style: TextStyle(color: Color(0xff898989), fontSize: 14),
-                      ),
-                      Text(
-                        'Никому его не сообщайте.',
-                        style: TextStyle(color: Color(0xff898989)),
-                      )
-                    ],
+                  const SizedBox(width: 7),
+                  const Expanded(
+                    flex: 7,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Это CVC2/CVV2-код.',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: Color(0xff898989), fontSize: 14),
+                        ),
+                        Text(
+                          'Никому его не сообщайте.',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: Color(0xff898989)),
+                        )
+                      ],
+                    ),
                   )
                 ],
               ),
+              const SizedBox(height: 5),
               const Spacer(),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

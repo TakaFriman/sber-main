@@ -192,7 +192,7 @@ class _HistoryPageState extends State<HistoryPage> {
               ? Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
-                  ).copyWith(top: 148),
+                  ).copyWith(top: MediaQuery.of(context).size.height * 0.2),
                   child: Column(
                     children: [
                       const Text(
@@ -324,7 +324,7 @@ class _HistoryPageState extends State<HistoryPage> {
                         if (index == 0 && !inserach)
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 15).copyWith(
-                              top: 90,
+                              top: MediaQuery.of(context).size.height * 0.095,
                               bottom: 10,
                             ),
                             child: const Column(
@@ -333,7 +333,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                 Text(
                                   'История',
                                   style: TextStyle(
-                                    fontSize: 22,
+                                    fontSize: 24,
                                     fontWeight: FontWeight.w500,
                                     color: Colors.white,
                                     fontFamily: 'SPB',
@@ -379,9 +379,9 @@ class _HistoryPageState extends State<HistoryPage> {
                             child: isLoading
                                 ? Center(
                                     child: (index == 0)
-                                        ? const Padding(
-                                            padding: EdgeInsets.only(top: 68.0),
-                                            child: CircularProgressIndicator(
+                                        ? Padding(
+                                            padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.2),
+                                            child: const CircularProgressIndicator(
                                               color: Color(0xFF08A652),
                                             ),
                                           )
@@ -396,10 +396,13 @@ class _HistoryPageState extends State<HistoryPage> {
                     );
                   },
                 ),
-          HistoryAppBar(
-            myCreditCard: widget.myCreditCard,
-            onSearchAmountChanged: filterChecks,
-            resetCheck: resetChecks,
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.125,
+            child: HistoryAppBar(
+              myCreditCard: widget.myCreditCard,
+              onSearchAmountChanged: filterChecks,
+              resetCheck: resetChecks,
+            ),
           ),
         ],
       ),

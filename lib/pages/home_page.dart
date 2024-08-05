@@ -147,7 +147,7 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(left: 15, right: 15, top: 70),
+                        padding: EdgeInsets.only(left: 15, right: 15, top: MediaQuery.of(context).size.height * 0.095),
                         child: CardBalanceWidget(
                           myCreditCard: widget.myCreditCard ??
                               CreditCard(
@@ -322,6 +322,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         Container(
+          height: MediaQuery.of(context).size.height * 0.125,
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
