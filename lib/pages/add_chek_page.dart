@@ -8,11 +8,13 @@ import 'package:sber/models/check.dart';
 
 const List<String> listBanks = <String>[
   'Сбербанк',
-  'Тинькоф',
+  'Т Банк',
   'ВТБ',
   'OZON',
   'Альфа Банк',
   'Почта Банк',
+  'Яндекс Банк',
+  'МТС Банк',
   'Зенит Банк',
   'Райфайзен Банк',
   'Открытие Банк',
@@ -28,6 +30,7 @@ const List<String> listBanks = <String>[
 const List<String> listStatus = <String>[
   'Входящий перевод',
   'Исходящий перевод',
+  'Покупка по карте',
 ];
 
 class ChekAdd extends StatefulWidget {

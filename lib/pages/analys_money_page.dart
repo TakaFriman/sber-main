@@ -1,14 +1,15 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:sber/components/date_and_history_chek.dart';
+import 'package:sber/models/check.dart';
 
 class AnalysMoneyPage extends StatefulWidget {
-  const AnalysMoneyPage({super.key, required this.incoming, required this.outgoing});
+  const AnalysMoneyPage({super.key, required this.incoming, required this.outgoing, required this.checks});
   final String incoming;
   final String outgoing;
+  final List<Chek> checks;
+
   @override
   _AnalysMoneyPageState createState() => _AnalysMoneyPageState();
 }
@@ -31,11 +32,38 @@ class _AnalysMoneyPageState extends State<AnalysMoneyPage> with SingleTickerProv
   ];
   final int _currentMonthIndex = DateTime.now().month - 1;
   int _selectedMonthIndex = DateTime.now().month - 1;
+  bool _isLoading = false;
+  Map<String, List<Chek>> incomingChecks = {};
+  Map<String, List<Chek>> outgoingChecks = {};
+  Map<String, List<Chek>> cardPurchases = {};
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _organizeChecksByStatusAndDate();
+  }
+
+  int getMonthNumber(String dateStr) {
+    // Парсим строку в объект DateTime
+    DateTime date = DateFormat('yyyy-MM-dd').parse(dateStr);
+
+    // Возвращаем номер месяца
+    return date.month;
+  }
+
+  void _organizeChecksByStatusAndDate() {
+    for (var check in widget.checks) {
+      String monthKey = '${getMonthNumber(check.date)}';
+      print(incomingChecks.values);
+      if (check.status == 'Входящий перевод') {
+        incomingChecks[monthKey] = (incomingChecks[monthKey] ?? [])..add(check);
+      } else if (check.status == 'Исходящий перевод') {
+        outgoingChecks[monthKey] = (outgoingChecks[monthKey] ?? [])..add(check);
+      } else if (check.status == 'Покупка по карте') {
+        cardPurchases[monthKey] = (cardPurchases[monthKey] ?? [])..add(check);
+      }
+    }
   }
 
   @override
@@ -46,23 +74,43 @@ class _AnalysMoneyPageState extends State<AnalysMoneyPage> with SingleTickerProv
 
   void _previousMonth() {
     setState(() {
-      _selectedMonthIndex = (_selectedMonthIndex - 1);
-      if (_selectedMonthIndex < 0) {
-        _selectedMonthIndex += 12;
-      }
+      _isLoading = true; // Начинаем загрузку
+    });
+
+    Future.delayed(const Duration(milliseconds: 500), () {
+      setState(() {
+        _selectedMonthIndex = (_selectedMonthIndex - 1);
+        if (_selectedMonthIndex < 0) {
+          _selectedMonthIndex += 12;
+        }
+        _isLoading = false; // Завершаем загрузку
+      });
     });
   }
 
   void _nextMonth() {
-    if (_selectedMonthIndex < _currentMonthIndex) {
+    setState(() {
+      _isLoading = true; // Начинаем загрузку
+    });
+
+    Future.delayed(const Duration(milliseconds: 500), () {
       setState(() {
-        _selectedMonthIndex = (_selectedMonthIndex + 1);
+        if (_selectedMonthIndex < _currentMonthIndex) {
+          _selectedMonthIndex = (_selectedMonthIndex + 1);
+        }
+        _isLoading = false; // Завершаем загрузку
       });
-    }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    String selectedMonthKey = '${_selectedMonthIndex + 1}';
+
+    List<Chek> currentIncomingChecks = incomingChecks[selectedMonthKey] ?? [];
+    List<Chek> currentOutgoingChecks = outgoingChecks[selectedMonthKey] ?? [];
+    List<Chek> currentCardPurchases = cardPurchases[selectedMonthKey] ?? [];
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -98,24 +146,37 @@ class _AnalysMoneyPageState extends State<AnalysMoneyPage> with SingleTickerProv
           ],
         ),
       ),
-      body: TabBarView(
-        physics: const NeverScrollableScrollPhysics(),
-        controller: _tabController,
+      body: Stack(
         children: [
-          ExpensesTab(
-            outgoing: widget.outgoing,
-            month: _months[_selectedMonthIndex],
-            onPreviousMonth: _previousMonth,
-            onNextMonth: _nextMonth,
-            canMoveNext: _selectedMonthIndex < _currentMonthIndex,
-          ),
-          IncomesTab(
-            incoming: widget.incoming,
-            month: _months[_selectedMonthIndex],
-            onPreviousMonth: _previousMonth,
-            onNextMonth: _nextMonth,
-            canMoveNext: _selectedMonthIndex < _currentMonthIndex,
-          ),
+          _isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.green,
+                  ),
+                )
+              : TabBarView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  controller: _tabController,
+                  children: [
+                    ExpensesTab(
+                      outgoingChecks: currentOutgoingChecks,
+                      cardPurchases: currentCardPurchases,
+                      month: _months[_selectedMonthIndex],
+                      onPreviousMonth: _previousMonth,
+                      onNextMonth: _nextMonth,
+                      canMoveNext: _selectedMonthIndex < _currentMonthIndex,
+                      isLoading: _isLoading, // добавлено
+                    ),
+                    IncomesTab(
+                      incomingChecks: currentIncomingChecks,
+                      month: _months[_selectedMonthIndex],
+                      onPreviousMonth: _previousMonth,
+                      onNextMonth: _nextMonth,
+                      canMoveNext: _selectedMonthIndex < _currentMonthIndex,
+                      isLoading: _isLoading, // добавлено
+                    ),
+                  ],
+                ),
         ],
       ),
     );
@@ -125,14 +186,17 @@ class _AnalysMoneyPageState extends State<AnalysMoneyPage> with SingleTickerProv
 class ExpensesTab extends StatelessWidget {
   const ExpensesTab({
     super.key,
-    required this.outgoing,
+    required this.outgoingChecks,
+    required this.cardPurchases,
     required this.month,
     required this.onPreviousMonth,
     required this.onNextMonth,
     required this.canMoveNext,
+    required this.isLoading,
   });
-
-  final String outgoing;
+  final bool isLoading;
+  final List<Chek> outgoingChecks;
+  final List<Chek> cardPurchases;
   final String month;
   final VoidCallback onPreviousMonth;
   final VoidCallback onNextMonth;
@@ -140,7 +204,19 @@ class ExpensesTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sum = formatIntNumberWithSpaces(int.parse(((double.parse(outgoing)).round()).toString().replaceAll('.', '')));
+    if (isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(
+          color: Colors.green,
+        ),
+      );
+    }
+    double outgoingSum = outgoingChecks.fold(0, (sum, item) => sum + item.cash);
+    double cardPurchaseSum = cardPurchases.fold(0, (sum, item) => sum + item.cash);
+    double totalSum = outgoingSum + cardPurchaseSum;
+
+    final formattedSum = formatIntNumberWithSpaces(int.parse(totalSum.round().toString()));
+
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
@@ -148,7 +224,7 @@ class ExpensesTab extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '$sum ₽',
+              '$formattedSum ₽',
               style: const TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.w600,
@@ -164,12 +240,16 @@ class ExpensesTab extends StatelessWidget {
                   onTap: onPreviousMonth,
                   child: const Icon(Icons.arrow_back_ios, color: Color.fromARGB(255, 129, 126, 126), size: 35),
                 ),
-                const Spacer(),
                 CircularPercentIndicator(
-                  radius: 100.0,
-                  lineWidth: 15.0,
+                  radius: 90.0,
+                  lineWidth: 13.0,
                   animation: true,
-                  percent: outgoing == '0.0' ? 0 : 1,
+                  animationDuration: 1200,
+                  percent: totalSum == 0.0
+                      ? 0
+                      : cardPurchaseSum > outgoingSum
+                          ? cardPurchaseSum / totalSum
+                          : outgoingSum / totalSum,
                   center: Text(
                     month,
                     style: const TextStyle(
@@ -178,16 +258,21 @@ class ExpensesTab extends StatelessWidget {
                     ),
                   ),
                   circularStrokeCap: CircularStrokeCap.round,
-                  backgroundColor: Colors.grey[300]!,
-                  progressColor: const Color.fromARGB(255, 29, 179, 34),
+                  backgroundColor: totalSum == 0.0
+                      ? const Color(0xff696969)
+                      : outgoingSum > cardPurchaseSum
+                          ? const Color.fromARGB(255, 19, 186, 220)
+                          : const Color.fromARGB(255, 21, 210, 27),
+                  progressColor: cardPurchaseSum > outgoingSum
+                      ? const Color.fromARGB(255, 19, 186, 220)
+                      : const Color.fromARGB(255, 21, 210, 27),
                 ),
-                const Spacer(),
                 canMoveNext
                     ? InkWell(
-                        onTap: onPreviousMonth,
+                        onTap: onNextMonth,
                         child: const Icon(Icons.arrow_forward_ios, color: Color.fromARGB(255, 129, 126, 126), size: 35),
                       )
-                    : const Spacer()
+                    : const SizedBox(width: 35),
               ],
             ),
             const SizedBox(height: 40),
@@ -200,24 +285,68 @@ class ExpensesTab extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 15),
-            CategoryItem(
-              iconText: 'assets/Переводы.svg',
-              category: 'Переводы людям',
-              amount: '$sum ₽',
-              transactions: outgoing == '0.0' ? '0 операций' : '${Random().nextInt(10) + 3} операций',
-            ),
-            const Padding(
-              padding: EdgeInsets.only(left: 55, right: 15),
-              child: Divider(
-                color: Color(0xff696969),
-                height: 25,
-              ),
-            ),
-            const CategoryItem(
-              iconText: 'assets/Plus.svg',
-              category: 'Добавить расход',
-              transactions: 'Например, если платили наличными',
-            ),
+            outgoingSum != 0.0
+                ? Column(
+                    children: [
+                      CategoryItem(
+                        iconText: 'assets/Переводы.svg',
+                        category: 'Переводы людям',
+                        amount: '${formatIntNumberWithSpaces(int.parse(outgoingSum.round().toString()))} ₽',
+                        transactions: outgoingSum == 0.0
+                            ? '0 операций'
+                            : outgoingChecks.length == 1
+                                ? '${outgoingChecks.length} операция'
+                                : outgoingChecks.length == 2 || outgoingChecks.length == 3 || outgoingChecks.length == 4
+                                    ? '${outgoingChecks.length} операции'
+                                    : '${outgoingChecks.length} операций',
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 55, right: 15),
+                        child: Divider(
+                          color: Color(0xff696969),
+                          height: 25,
+                        ),
+                      ),
+                    ],
+                  )
+                : const SizedBox(),
+            cardPurchaseSum != 0.0
+                ? Column(
+                    children: [
+                      CategoryItem(
+                        color: const Color.fromARGB(255, 19, 186, 220),
+                        iconText: 'assets/chart.svg',
+                        category: 'Покупки товаров и услуг',
+                        amount: '${formatIntNumberWithSpaces(int.parse(cardPurchaseSum.round().toString()))} ₽',
+                        transactions: cardPurchaseSum == 0.0
+                            ? '0 операций'
+                            : cardPurchases.length == 1
+                                ? '${cardPurchases.length} операция'
+                                : cardPurchases.length == 2 || cardPurchases.length == 3 || cardPurchases.length == 4
+                                    ? '${cardPurchases.length} операции'
+                                    : '${cardPurchases.length} операций',
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 55, right: 15),
+                        child: Divider(
+                          color: Color(0xff696969),
+                          height: 25,
+                        ),
+                      ),
+                      const CategoryItem(
+                        iconText: 'assets/Plus.svg',
+                        category: 'Добавить расход',
+                        transactions: 'Например, если платили наличными',
+                      ),
+                      const SizedBox(height: 64),
+                    ],
+                  )
+                : const CategoryItem(
+                    iconText: 'assets/Plus.svg',
+                    category: 'Добавить расход',
+                    transactions: 'Например, если платили наличными',
+                  ),
+            const SizedBox(height: 64),
           ],
         ),
       ),
@@ -228,22 +357,33 @@ class ExpensesTab extends StatelessWidget {
 class IncomesTab extends StatelessWidget {
   const IncomesTab({
     super.key,
-    required this.incoming,
+    required this.incomingChecks,
     required this.month,
     required this.onPreviousMonth,
     required this.onNextMonth,
     required this.canMoveNext,
+    required this.isLoading,
   });
 
-  final String incoming;
+  final List<Chek> incomingChecks;
   final String month;
   final VoidCallback onPreviousMonth;
   final VoidCallback onNextMonth;
   final bool canMoveNext;
-
+  final bool isLoading;
   @override
   Widget build(BuildContext context) {
-    final sum = formatIntNumberWithSpaces(int.parse(((double.parse(incoming)).round()).toString().replaceAll('.', '')));
+    if (isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(
+          color: Colors.green,
+        ),
+      );
+    }
+    double incomingSum = incomingChecks.fold(0, (sum, item) => sum + item.cash);
+
+    final formattedSum = formatIntNumberWithSpaces(int.parse(incomingSum.round().toString()));
+
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
@@ -251,7 +391,7 @@ class IncomesTab extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '$sum ₽',
+              '$formattedSum ₽',
               style: const TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.w600,
@@ -266,12 +406,12 @@ class IncomesTab extends StatelessWidget {
                   onTap: onPreviousMonth,
                   child: const Icon(Icons.arrow_back_ios, color: Color.fromARGB(255, 129, 126, 126), size: 35),
                 ),
-                const Spacer(),
                 CircularPercentIndicator(
-                  radius: 100.0,
-                  lineWidth: 15.0,
+                  radius: 90.0,
+                  lineWidth: 13.0,
                   animation: true,
-                  percent: incoming == '0.0' ? 0 : 1,
+                  animationDuration: 1200,
+                  percent: incomingSum == 0.0 ? 0 : 1,
                   center: Text(
                     month,
                     style: const TextStyle(
@@ -283,13 +423,12 @@ class IncomesTab extends StatelessWidget {
                   backgroundColor: Colors.grey[300]!,
                   progressColor: const Color.fromARGB(255, 29, 179, 34),
                 ),
-                const Spacer(),
                 canMoveNext
                     ? InkWell(
-                        onTap: onPreviousMonth,
+                        onTap: onNextMonth,
                         child: const Icon(Icons.arrow_forward_ios, color: Color.fromARGB(255, 129, 126, 126), size: 35),
                       )
-                    : const Spacer()
+                    : const SizedBox(width: 35),
               ],
             ),
             const SizedBox(height: 40),
@@ -302,18 +441,30 @@ class IncomesTab extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 15),
-            CategoryItem(
-              iconText: 'assets/Переводы.svg',
-              category: 'Переводы от людей',
-              amount: '$sum ₽',
-              transactions: incoming == '0.0' ? '0 операций' : '${Random().nextInt(10) + 3} операций',
-            ),
-            const Padding(
-                padding: EdgeInsets.only(left: 55, right: 15),
-                child: Divider(
-                  color: Color(0xff696969),
-                  height: 10,
-                )),
+            incomingSum != 0.0
+                ? Column(
+                    children: [
+                      CategoryItem(
+                        iconText: 'assets/Переводы.svg',
+                        category: 'Переводы от людей',
+                        amount: '${formatIntNumberWithSpaces(int.parse(incomingSum.round().toString()))} ₽',
+                        transactions: incomingSum == 0.0
+                            ? '0 операций'
+                            : incomingChecks.length == 1
+                                ? '${incomingChecks.length} операция'
+                                : incomingChecks.length == 2 || incomingChecks.length == 3 || incomingChecks.length == 4
+                                    ? '${incomingChecks.length} операции'
+                                    : '${incomingChecks.length} операций',
+                      ),
+                      const Padding(
+                          padding: EdgeInsets.only(left: 55, right: 15),
+                          child: Divider(
+                            color: Color(0xff696969),
+                            height: 10,
+                          )),
+                    ],
+                  )
+                : const SizedBox(),
             const CategoryItem(
               iconText: 'assets/Plus.svg',
               category: 'Добавить зачисление',
@@ -326,11 +477,16 @@ class IncomesTab extends StatelessWidget {
   }
 }
 
+String formatIntNumberWithSpaces(int number) {
+  return number.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(?:\d{3})+(?!\d))'), (Match m) => '${m[1]} ');
+}
+
 class CategoryItem extends StatelessWidget {
   final String iconText;
   final String category;
   final String? amount;
   final String transactions;
+  final Color? color;
 
   const CategoryItem({
     super.key,
@@ -338,6 +494,7 @@ class CategoryItem extends StatelessWidget {
     required this.category,
     this.amount,
     required this.transactions,
+    this.color,
   });
 
   @override
@@ -347,8 +504,7 @@ class CategoryItem extends StatelessWidget {
         onTap: () {},
         titleAlignment: ListTileTitleAlignment.titleHeight,
         leading: SvgPicture.asset(
-          iconText,
-          width: 40,
+          iconText, width: 40, color: color, //const Color.fromARGB(255, 12, 214, 73),
         ),
         title: Text(
           category,

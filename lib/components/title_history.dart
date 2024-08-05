@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sber/animation/sceleton.dart';
-import 'package:sber/components/date_and_history_chek.dart';
+import 'package:sber/models/check.dart';
 import 'package:sber/models/month.dart';
 import 'package:sber/pages/analys_money_page.dart';
 import 'package:sber/pages/home_page.dart';
@@ -8,11 +8,29 @@ import 'package:sber/pages/home_page.dart';
 class TitleHistory extends StatelessWidget {
   final String incoming;
   final String outgoing;
+  final List<Chek> checks;
   const TitleHistory({
     super.key,
     required this.incoming,
     required this.outgoing,
+    required this.checks,
   });
+  String formatIntNumberWithSpaces(int number) {
+    String formattedString = number.toString();
+    String result = '';
+    int count = 0;
+
+    // Проходим по строке справа налево и добавляем пробел каждые 3 символа
+    for (int i = formattedString.length - 1; i >= 0; i--) {
+      result = formattedString[i] + result;
+      count++;
+      if (count % 3 == 0 && i > 0) {
+        result = ' $result';
+      }
+    }
+    result = result.replaceAll(' .', ',');
+    return result;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +93,7 @@ class TitleHistory extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         SizedBox(
-          height: 140,
+          height: 120,
           child: ListView(
             shrinkWrap: true,
             scrollDirection: Axis.horizontal,
@@ -93,13 +111,14 @@ class TitleHistory extends StatelessWidget {
                           builder: (context) => AnalysMoneyPage(
                             incoming: incoming,
                             outgoing: outgoing,
+                            checks: checks,
                           ),
                         ),
                       );
                     },
                     child: SizedBox(
                       height: MediaQuery.of(context).size.height * 0.2,
-                      width: 220,
+                      width: 245,
                       child: AspectRatio(
                         aspectRatio: 1.8,
                         child: Container(
@@ -280,7 +299,7 @@ class CardHistory extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 150,
+      width: 135,
       height: MediaQuery.of(context).size.height * 0.2,
       child: AspectRatio(
         aspectRatio: 1.1,

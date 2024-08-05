@@ -83,167 +83,166 @@ class _AboutCardsState extends State<AboutCards> with SingleTickerProviderStateM
               ),
       ),
       backgroundColor: const Color(0xFF121212),
-      body: Column(
-        children: [
-          SizedBox(
-            height: 220,
-            child: Padding(
-                padding: const EdgeInsets.only(top: 8.0, right: 8),
-                child: GestureDetector(
-                    onTap: _flipCard,
-                    child: Transform(
-                      transform: Matrix4.rotationY((_animation.value) * pi),
-                      alignment: Alignment.center,
-                      child: isLoading
-                          ? Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: SkeletonIconContainer(
-                                width: 400,
-                                height: 200,
-                                borderRadius: BorderRadius.circular(20),
-                                text: '',
-                                style: const TextStyle(),
-                              ),
-                            )
-                          : _isFront
-                              ? Container(
-                                  width: 360,
-                                  height: 230,
-                                  decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [
-                                        Color.fromARGB(255, 169, 191, 208),
-                                        Color.fromARGB(255, 112, 134, 150),
-                                        Color.fromARGB(255, 83, 100, 112),
-                                        Color.fromARGB(255, 83, 100, 112),
-                                        Color.fromARGB(255, 112, 134, 150),
-                                        Color.fromARGB(255, 169, 191, 208),
-                                      ],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                    ),
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(15),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        child: Column(
+          children: [
+            SizedBox(
+              height: 220,
+              width: double.infinity,
+              child: GestureDetector(
+                  onTap: _flipCard,
+                  child: Transform(
+                    transform: Matrix4.rotationY((_animation.value) * pi),
+                    alignment: Alignment.center,
+                    child: isLoading
+                        ? Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: SkeletonIconContainer(
+                              width: 400,
+                              height: 200,
+                              borderRadius: BorderRadius.circular(20),
+                              text: '',
+                              style: const TextStyle(),
+                            ),
+                          )
+                        : _isFront
+                            ? Container(
+                                width: 360,
+                                height: 230,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color.fromARGB(255, 169, 191, 208),
+                                      Color.fromARGB(255, 112, 134, 150),
+                                      Color.fromARGB(255, 83, 100, 112),
+                                      Color.fromARGB(255, 83, 100, 112),
+                                      Color.fromARGB(255, 112, 134, 150),
+                                      Color.fromARGB(255, 169, 191, 208),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
                                   ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            SvgPicture.asset('assets/Icons/сбер.svg',
-                                                width: 37,
-                                                colorFilter: const ColorFilter.mode(
-                                                  Color(0xfff4f4f4),
-                                                  BlendMode.srcIn,
-                                                )),
-                                            Container(
-                                              decoration: BoxDecoration(
-                                                  color: const Color.fromARGB(255, 177, 177, 177).withOpacity(0.4),
-                                                  borderRadius: BorderRadius.circular(25)),
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          SvgPicture.asset('assets/Icons/сбер.svg',
+                                              width: 37,
+                                              colorFilter: const ColorFilter.mode(
+                                                Color(0xfff4f4f4),
+                                                BlendMode.srcIn,
+                                              )),
+                                          Container(
+                                            decoration: BoxDecoration(
+                                                color: const Color.fromARGB(255, 177, 177, 177).withOpacity(0.4),
+                                                borderRadius: BorderRadius.circular(25)),
+                                            child: Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                               child: Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                                child: Padding(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 6),
-                                                  child: Row(
-                                                    children: [
-                                                      SvgPicture.asset(
-                                                        'assets/Icons/сбер.svg',
-                                                        colorFilter: ColorFilter.mode(
-                                                          BODY_DARK_GRAY.withOpacity(0.7),
-                                                          BlendMode.srcIn,
-                                                        ),
-                                                        width: 12,
+                                                padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 6),
+                                                child: Row(
+                                                  children: [
+                                                    SvgPicture.asset(
+                                                      'assets/Icons/сбер.svg',
+                                                      colorFilter: ColorFilter.mode(
+                                                        BODY_DARK_GRAY.withOpacity(0.7),
+                                                        BlendMode.srcIn,
                                                       ),
-                                                      const SizedBox(
-                                                        width: 3,
-                                                      ),
-                                                      Text(
-                                                        'Pay',
-                                                        style: TextStyle(
-                                                            letterSpacing: -0.5,
-                                                            fontSize: 10,
-                                                            fontWeight: FontWeight.w500,
-                                                            color: BODY_DARK_GRAY.withOpacity(0.6)),
-                                                      ),
-                                                    ],
-                                                  ),
+                                                      width: 12,
+                                                    ),
+                                                    const SizedBox(
+                                                      width: 3,
+                                                    ),
+                                                    Text(
+                                                      'Pay',
+                                                      style: TextStyle(
+                                                          letterSpacing: -0.5,
+                                                          fontSize: 10,
+                                                          fontWeight: FontWeight.w500,
+                                                          color: BODY_DARK_GRAY.withOpacity(0.6)),
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(20.0),
-                                        child: Row(
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                    '\u2022\u2022 ${widget.myCreditCard.cardNumber.substring((widget.myCreditCard.cardNumber.length) - 4)} \u2022 зарплатная',
-                                                    style: const TextStyle(
-                                                        color: Color(0xfff4f4f4),
-                                                        fontSize: 14,
-                                                        fontWeight: FontWeight.w500)),
-                                                const Text('Показать данные',
-                                                    style: TextStyle(
-                                                        color: Color(0xfff4f4f4),
-                                                        fontSize: 14,
-                                                        fontWeight: FontWeight.w500))
-                                              ],
                                             ),
-                                            ClipRRect(
-                                              borderRadius: BorderRadius.circular(5),
-                                              child: Image.asset(
-                                                'assets/mir.jpg',
-                                                width: 60,
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                )
-                              : Transform(
-                                  transform: Matrix4.rotationY(-pi),
-                                  alignment: Alignment.center,
-                                  child: AboutCardsData(
-                                    balance: widget.myCreditCard.name,
-                                    bacgcolor: const Color(0xff1e1e1e),
-                                    numberCards: widget.myCreditCard.cardNumber,
-                                    dateCards: widget.myCreditCard.expirationDate,
-                                    cvc: widget.myCreditCard.cvc,
-                                  ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(20.0),
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                  '\u2022\u2022 ${widget.myCreditCard.cardNumber.substring((widget.myCreditCard.cardNumber.length) - 4)} \u2022 зарплатная',
+                                                  style: const TextStyle(
+                                                      color: Color(0xfff4f4f4),
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w500)),
+                                              const Text('Показать данные',
+                                                  style: TextStyle(
+                                                      color: Color(0xfff4f4f4),
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w500))
+                                            ],
+                                          ),
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(5),
+                                            child: Image.asset(
+                                              'assets/mir.jpg',
+                                              width: 60,
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    )
+                                  ],
                                 ),
-                    ))),
-          ),
-          const SizedBox(
-            height: 30,
-          ),
-          Column(
-            children: [
-              Text('${formatNumberWithSpaces(double.parse(widget.balance))} ₽',
-                  style: const TextStyle(color: Color(0xfff4f4f4), fontSize: 21, fontWeight: FontWeight.w500)),
-              const Text(
-                'Карта в рублях',
-                style: TextStyle(color: Color(0xff898989), fontSize: 14),
-              )
-            ],
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Row(
+                              )
+                            : Transform(
+                                transform: Matrix4.rotationY(-pi),
+                                alignment: Alignment.center,
+                                child: AboutCardsData(
+                                  balance: widget.myCreditCard.name,
+                                  bacgcolor: const Color(0xff1e1e1e),
+                                  numberCards: widget.myCreditCard.cardNumber,
+                                  dateCards: widget.myCreditCard.expirationDate,
+                                  cvc: widget.myCreditCard.cvc,
+                                ),
+                              ),
+                  )),
+            ),
+            const SizedBox(
+              height: 25,
+            ),
+            Column(
+              children: [
+                Text('${formatNumberWithSpaces(double.parse(widget.balance))} ₽',
+                    style: const TextStyle(color: Color(0xfff4f4f4), fontSize: 21, fontWeight: FontWeight.w500)),
+                const Text(
+                  'Карта в рублях',
+                  style: TextStyle(color: Color(0xff898989), fontSize: 14),
+                )
+              ],
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Row(
               children: [
                 Expanded(
                     flex: 6,
@@ -313,11 +312,8 @@ class _AboutCardsState extends State<AboutCards> with SingleTickerProviderStateM
                     ))
               ],
             ),
-          ),
-          const SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Row(
+            const SizedBox(height: 10),
+            Row(
               children: [
                 Expanded(
                     flex: 6,
@@ -366,9 +362,9 @@ class _AboutCardsState extends State<AboutCards> with SingleTickerProviderStateM
                       ]),
                     ))
               ],
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }

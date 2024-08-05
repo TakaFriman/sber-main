@@ -120,7 +120,7 @@ class _HomePageState extends State<HomePage> {
         // Иначе отображаем содержимое страницы
         if (!isLoading)
           RefreshIndicator(
-            displacement: 80,
+            displacement: 110,
             backgroundColor: Colors.black,
             color: const Color(0xFF08A652),
             onRefresh: _refresh,

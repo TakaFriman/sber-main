@@ -9,9 +9,8 @@ class Chek {
   final double cash;
   final String date;
   final String image;
-  final String? time; // Добавленное поле time
-
-  final String? balance; // Добавленное поле time
+  final String? time;
+  final String? balance; 
 
   Chek({
     required this.date,

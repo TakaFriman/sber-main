@@ -9,7 +9,6 @@ import 'package:sber/components/title_history.dart';
 import 'package:sber/models/check.dart';
 import 'package:sber/models/profile.dart';
 import 'package:sber/pages/chek_about.dart';
-import 'package:sber/pages/home_page.dart';
 import 'package:sber/pages/incoming_page.dart';
 import 'package:sber/theme/colors.dart';
 
@@ -19,6 +18,7 @@ bool inserach = true;
 bool? isSearching;
 String? incoming;
 String? outgoing;
+double? searchAmount;
 
 class HistoryPage extends StatefulWidget {
   final CreditCard myCreditCard;
@@ -34,7 +34,7 @@ class _HistoryPageState extends State<HistoryPage> {
 
     for (var check in _checks) {
       final currentMonth = DateFormat('MMMM', 'ru').format(DateTime.now());
-      final month = DateFormat('MMMM', 'ru').format(DateTime.tryParse(check.date) ?? DateTime.timestamp());
+      final month = DateFormat('MMMM', 'ru').format(DateTime.tryParse(check.date) ?? DateTime.now());
 
       if (check.status == status && month == currentMonth) {
         totalCash += check.cash;
@@ -48,19 +48,8 @@ class _HistoryPageState extends State<HistoryPage> {
 
   List<Chek> _checks = [];
   List<Chek> _newChecks = [];
-  Future<void> _refresh() async {
-    setState(() {
-      enabled1 = true;
-    });
-
-    await Future.delayed(const Duration(seconds: 1));
-
-    setState(() {
-      enabled1 = false;
-    });
-  }
-
   bool isLoading = true;
+  bool enabled1 = false;
 
   @override
   void initState() {
@@ -95,11 +84,16 @@ class _HistoryPageState extends State<HistoryPage> {
     return '$totalCash';
   }
 
-  void filterChecks(String searchText) {
+  void filterChecks(String searchText) async {
     setState(() {
-      if (searchText.isEmpty) {
-        _newChecks = _checks;
-        noResults = false;
+      isLoading = true;
+    });
+
+    await Future.delayed(const Duration(seconds: 1)); // Имитация загрузки
+
+    setState(() {
+      if (searchText.trim().isEmpty) {
+        resetChecks(); // Возвращаем все элементы в список
       } else {
         _newChecks = _checks.where((check) {
           String cashString = check.cash.toString().toLowerCase();
@@ -113,8 +107,16 @@ class _HistoryPageState extends State<HistoryPage> {
           }
         }).toList();
 
-        noResults = _newChecks.isEmpty;
+        noResults = _newChecks.isEmpty && searchText.trim().isNotEmpty;
       }
+      isLoading = false;
+    });
+  }
+
+  void resetChecks() {
+    setState(() {
+      noResults = false;
+      _newChecks = _checks;
     });
   }
 
@@ -132,13 +134,6 @@ class _HistoryPageState extends State<HistoryPage> {
     }
 
     return '$totalCash';
-  }
-
-  void resetChecks() {
-    setState(() {
-      _newChecks = _checks;
-      noResults = false;
-    });
   }
 
   Future<void> _simulateLoading() async {
@@ -162,21 +157,37 @@ class _HistoryPageState extends State<HistoryPage> {
     return checks;
   }
 
+  Future<void> _refresh() async {
+    await Future.delayed(const Duration(seconds: 1)); // Имитация загрузки
+
+    try {
+      List<Chek> loadedChecks = await CheckRepository.loadChecks();
+      setState(() {
+        _checks = loadedChecks;
+        _newChecks = loadedChecks;
+        incoming = calculateTotalCashForStatus('Входящий перевод');
+        outgoing = calculateTotalCashForStatus('Исходящий перевод');
+      });
+    } catch (e) {
+      print('Ошибка при загрузке чеков: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     _checks = sortChecksByDate(_checks);
     List<String> uniqueDates = _newChecks.map((check) => check.date).toSet().toList();
     uniqueDates = uniqueDates.reversed.toList();
 
-    return Stack(
-      children: [
-        RefreshIndicator(
-          backgroundColor: Colors.black,
-          color: const Color(0xFF08A652),
-          onRefresh: _refresh,
-          displacement: 40,
-          edgeOffset: 300.0,
-          child: noResults
+    return RefreshIndicator(
+      backgroundColor: Colors.black,
+      color: const Color(0xFF08A652),
+      onRefresh: _refresh,
+      displacement: 40,
+      edgeOffset: 380.0,
+      child: Stack(
+        children: [
+          noResults
               ? Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
@@ -262,7 +273,11 @@ class _HistoryPageState extends State<HistoryPage> {
                       cash: calculateTotalCashForDate(currentDate),
                       totalCash: outSum,
                     );
-
+                    Widget dateChekSerch = DataCheckSearh(
+                      date: currentDate,
+                      cash: calculateTotalCashForDate(currentDate),
+                      totalCash: outSum,
+                    );
                     List<Chek> filteredChecks = _newChecks.where((check) => check.date == currentDate).toList();
                     if (searchAmount != null) {
                       filteredChecks = filteredChecks.where((check) => check.cash == searchAmount).toList();
@@ -306,8 +321,25 @@ class _HistoryPageState extends State<HistoryPage> {
                     return Column(
                       children: [
                         if (index == 0 && !inserach)
-                          const SizedBox(
-                            height: 70,
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 15).copyWith(
+                              top: 90,
+                              bottom: 10,
+                            ),
+                            child: const Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Text(
+                                  'История',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white,
+                                    fontFamily: 'SPB',
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         if (index == 0 && (inserach))
                           Container(
@@ -333,6 +365,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                 TitleHistory(
                                   incoming: incoming!,
                                   outgoing: outgoing!,
+                                  checks: _checks,
                                 ),
                                 const SelectBarList(),
                                 const SizedBox(
@@ -354,7 +387,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                         : const Text(''))
                                 : Column(
                                     children: [
-                                      dateChek,
+                                      if (!inserach) dateChekSerch else dateChek,
                                       ...chekHistoryWidgets,
                                     ],
                                   )),
@@ -362,12 +395,13 @@ class _HistoryPageState extends State<HistoryPage> {
                     );
                   },
                 ),
-        ),
-        HistoryAppBar(
-          onSearchAmountChanged: filterChecks,
-          resetCheck: resetChecks,
-        ),
-      ],
+          HistoryAppBar(
+            myCreditCard: widget.myCreditCard,
+            onSearchAmountChanged: filterChecks,
+            resetCheck: resetChecks,
+          ),
+        ],
+      ),
     );
   }
 }

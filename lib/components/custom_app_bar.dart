@@ -23,26 +23,6 @@ class CustomAppBar extends StatelessWidget {
                     myCreditCard: myCreditCard,
                   ),
                 ),
-
-                // PageRouteBuilder(
-                //   pageBuilder: (context, animation, secondaryAnimation) => ProfilePage(
-                //     myCreditCard: myCreditCard,
-                //   ),
-                //   transitionDuration: const Duration(milliseconds: 1000), // Длительность анимации
-                //   reverseTransitionDuration:
-                //       const Duration(milliseconds: 200), // Длительность обратной анимации при возврате
-                //   transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                //     const begin = Offset(0.0, 1.0);
-                //     const end = Offset.zero;
-                //     const curve = Curves.easeOutCubic; // Кривая анимации
-                //     var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-                //     var offsetAnimation = animation.drive(tween);
-                //     return SlideTransition(
-                //       position: offsetAnimation,
-                //       child: child,
-                //     );
-                //   },
-                // ),
               );
             },
             child: SizedBox(
@@ -61,7 +41,9 @@ class CustomAppBar extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: TextField(
+              cursorColor: Colors.grey,
               decoration: InputDecoration(
+                  suffixIcon: const SizedBox(),
                   hintText: 'Поиск',
                   isDense: true,
                   hintStyle: const TextStyle(color: Color(0xFFB3BDC6), fontSize: 14),
