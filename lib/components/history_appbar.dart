@@ -5,8 +5,6 @@ import 'package:sber/models/profile.dart';
 import 'package:sber/pages/history_page.dart';
 import 'package:sber/pages/profile_page.dart';
 
-TextEditingController searchAmount = TextEditingController();
-
 class HistoryAppBar extends StatefulWidget {
   final CreditCard myCreditCard;
   final Function(String) onSearchAmountChanged; // Объявляем callback
@@ -16,7 +14,8 @@ class HistoryAppBar extends StatefulWidget {
     Key? key,
     required this.onSearchAmountChanged,
     required this.resetCheck,
-    required this.myCreditCard, // Передаем callback в конструкторе
+    required this.myCreditCard,
+    // Передаем callback в конструкторе
   }) : super(key: key);
 
   @override
@@ -27,6 +26,13 @@ class _HistoryAppBarState extends State<HistoryAppBar> {
   bool isLoading = false;
   bool _showClearButton = false;
   Timer? _debounce;
+  late TextEditingController searchAmount;
+
+  @override
+  void initState() {
+    super.initState();
+    searchAmount = TextEditingController();
+  }
 
   void _onSearchChanged(String value) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
@@ -65,6 +71,7 @@ class _HistoryAppBarState extends State<HistoryAppBar> {
   void dispose() {
     _debounce?.cancel();
     searchAmount.dispose();
+    inserach = true;
     super.dispose();
   }
 

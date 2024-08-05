@@ -22,6 +22,7 @@ double? searchAmount;
 
 class HistoryPage extends StatefulWidget {
   final CreditCard myCreditCard;
+
   const HistoryPage({super.key, required this.myCreditCard});
 
   @override
